@@ -14,7 +14,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -98,6 +98,7 @@ jobs:
           yarn lint:kt
           echo "::remove-matcher owner=ktlint::"
       - name: SwiftFormat
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           brew install swiftformat
           echo "::add-matcher::.github/swiftformat.json"
@@ -108,13 +109,24 @@ jobs:
           echo "::add-matcher::.github/swiftlint.json"
           swiftlint
           echo "::remove-matcher owner=swiftlint::"
+      - name: /yarn.lock changes
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: Simek/yarn-lock-changes@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: /example/yarn.lock changes
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: Simek/yarn-lock-changes@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: example/yarn.lock
   ios:
     name: "iOS"
     runs-on: macos-latest
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -132,7 +144,7 @@ jobs:
           # https://github.com/facebook/react-native/issues/30036 and
           # https://github.com/microsoft/react-native-macos/issues/620 for more
           # details.
-          yarn set-react-version master
+          yarn set-react-version main
       - name: Install
         run: |
           yarn ci
@@ -143,6 +155,10 @@ jobs:
           yarn build:ios || yarn build:ios
           pod install --project-directory=ios
           ../scripts/xcodebuild.sh ios/Example.xcworkspace build-for-testing
+        working-directory: example
+      - name: Test `react-native config`
+        run: |
+          yarn jest
         working-directory: example
       - name: Test
         run: |
@@ -157,7 +173,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -181,6 +197,10 @@ jobs:
       - name: Install
         run: |
           scripts/install-test-template.sh ${{ matrix.template }}
+      - name: react-native init-test-app
+        run: |
+          yarn react-native init-test-app --destination test-app --name TestApp --platform ${{ matrix.template }}
+        working-directory: template-example
       - name: Build
         run: |
           set -eo pipefail
@@ -193,11 +213,15 @@ jobs:
             ../scripts/xcodebuild.sh ios/TemplateExample.xcworkspace build
           fi
         working-directory: template-example
+      - name: react-native run-ios
+        run: |
+          ../test/react-native.js run-ios
+        working-directory: template-example
   android:
     name: "Android"
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-11, windows-latest]
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name != 'schedule' && !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
@@ -207,7 +231,7 @@ jobs:
           distribution: adopt
           java-version: 8
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -228,6 +252,10 @@ jobs:
         run: |
           yarn ci
         working-directory: example
+      - name: Test `react-native config`
+        run: |
+          yarn jest
+        working-directory: example
       - name: Build
         run: |
           set -eo pipefail
@@ -237,22 +265,22 @@ jobs:
         shell: bash
         working-directory: example
       - name: Cache /.yarn-offline-mirror
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os == 'macos-11' }}
         uses: actions/cache@v2
         with:
           path: .yarn-offline-mirror
           key: ${{ hashFiles('yarn.lock') }}
       - name: Install /
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os == 'macos-11' }}
         run: |
           yarn ci
       - name: Run instrumented tests
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os == 'macos-11' }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          script: cd android/ && ./gradlew clean build connectedCheck
-          arch: x86_64
+          working-directory: android
+          script: ./gradlew clean build connectedCheck
   android-template:
     name: "Android [template]"
     strategy:
@@ -268,7 +296,7 @@ jobs:
           distribution: adopt
           java-version: 8
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -293,6 +321,11 @@ jobs:
         run: |
           scripts/install-test-template.sh ${{ matrix.template }}
         shell: bash
+      - name: react-native init-test-app
+        run: |
+          yarn react-native init-test-app --destination test-app --name TestApp --platform ${{ matrix.template }}
+        shell: bash
+        working-directory: template-example
       - name: Build
         run: |
           set -eo pipefail
@@ -301,13 +334,17 @@ jobs:
           ./gradlew clean build check test
         shell: bash
         working-directory: template-example
+      - name: react-native run-android
+        run: |
+          ../test/react-native.js run-android
+        working-directory: template-example
   macos:
     name: "macOS"
     runs-on: macos-latest
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -333,6 +370,10 @@ jobs:
           pod install --project-directory=macos
           ../scripts/xcodebuild.sh macos/Example.xcworkspace build-for-testing
         working-directory: example
+      - name: Test `react-native config`
+        run: |
+          yarn jest
+        working-directory: example
       - name: Test
         run: |
           ../scripts/xcodebuild.sh macos/Example.xcworkspace test-without-building
@@ -352,7 +393,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -376,6 +417,10 @@ jobs:
       - name: Install
         run: |
           scripts/install-test-template.sh ${{ matrix.template }}
+      - name: Init test app
+        run: |
+          yarn react-native init-test-app --destination test-app --name TestApp --platform ${{ matrix.template }}
+        working-directory: template-example
       - name: Build
         run: |
           set -eo pipefail
@@ -402,7 +447,7 @@ jobs:
       - name: Set up VSTest.console.exe
         uses: darenm/Setup-VSTest@v1
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -425,6 +470,10 @@ jobs:
         run: |
           yarn build:windows
           yarn install-windows-test-app --use-nuget
+        working-directory: example
+      - name: Test `react-native config`
+        run: |
+          yarn jest
         working-directory: example
       - name: Install NuGet packages
         run: |
@@ -451,7 +500,7 @@ jobs:
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
@@ -476,6 +525,11 @@ jobs:
         run: |
           scripts/install-test-template.sh ${{ matrix.template }}
         shell: bash
+      - name: Init test app
+        run: |
+          yarn react-native init-test-app --destination test-app --name TestApp --platform ${{ matrix.template }}
+        shell: bash
+        working-directory: template-example
       - name: Build bundle and create solution
         run: |
           yarn build:windows
@@ -509,7 +563,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v2.2.0
         with:
           node-version: 14
       - name: Checkout
