@@ -5027,9 +5027,9 @@ react-native-test-app@../:
     yargs "^16.0.0"
 
 react-native-windows@^0.63.32:
-  version "0.63.37"
-  resolved "https://registry.npmjs.org/react-native-windows/-/react-native-windows-0.63.37.tgz#a92fddd1907fbc5b93bd3afa4070836971d6d2f2"
-  integrity sha512-SZ7Q2C8hRaSclpzQKOj6N5PctetLUc6vgC/us8Qqw5EjLdXVAO46NSiQn6rqRHIg3Bwyq5lqRbps8MC8AfP20A==
+  version "0.63.38"
+  resolved "https://registry.npmjs.org/react-native-windows/-/react-native-windows-0.63.38.tgz#fbda369819e30ad77bb70acd65ed20024fdfbe36"
+  integrity sha512-sx8GlX2uYVqmlf4Cc44hxvMTrTj8tlZfO/Eri1G1+x0LRIxI0OqIluzAiycUNzHhjtmMHYeMhOvaYz+irwG5AQ==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@react-native-windows/cli" "0.63.13"
