@@ -1110,12 +1110,13 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
-"@react-native-windows/cli@0.63.13":
-  version "0.63.13"
-  resolved "https://registry.npmjs.org/@react-native-windows/cli/-/cli-0.63.13.tgz#11beef73eb0af785e6ab754364fad50eaffbfacf"
-  integrity sha512-ehQBaaqA3wHgqb616KF9Gg6RF389An0C2S8Z8UVomQgE5G5jzS2blYS0D7gcmr41oY/TuS3SHQldVCFkHKyOGA==
+"@react-native-windows/cli@0.63.14":
+  version "0.63.14"
+  resolved "https://registry.npmjs.org/@react-native-windows/cli/-/cli-0.63.14.tgz#b077f2d090f2d63f2defa71926c4de77b0041ea8"
+  integrity sha512-RqKnAwrsA2aKqP4gYLktOrqorqvIiUMXUhe07GPh/GDzoizVgSjcgRD4x8hoxNXbU66fYFm+whvCBgfn88Ffpg==
   dependencies:
     "@react-native-windows/telemetry" "^0.63.5"
+    "@xmldom/xmldom" "^0.7.5"
     chalk "^3.0.0"
     cli-spinners "^2.2.0"
     envinfo "^7.5.0"
@@ -1130,7 +1131,6 @@
     username "^5.1.0"
     uuid "^3.3.2"
     xml-parser "^1.2.1"
-    xmldom "^0.5.0"
     xpath "^0.0.27"
 
 "@react-native-windows/telemetry@^0.63.5":
@@ -1279,6 +1279,11 @@
   integrity sha512-YlFfTGS+zqCgXuXNV26rOIeETOkXnGQXP/pjjL9P0gO/EP9jTmc7pUBhx+jVEIxpq41RX33GQ7N3DzOSfZoglQ==
   dependencies:
     "@types/yargs-parser" "*"
+
+"@xmldom/xmldom@^0.7.5":
+  version "0.7.5"
+  resolved "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.7.5.tgz#09fa51e356d07d0be200642b0e4f91d8e6dd408d"
+  integrity sha512-V3BIhmY36fXZ1OtVcI9W+FxQqxVLsPKcNjWigIaa81dLC9IolJl5Mt4Cvhmr0flUnjSpTdrbMTSbXqYqV5dT6A==
 
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
@@ -5027,12 +5032,12 @@ react-native-test-app@../:
     yargs "^16.0.0"
 
 react-native-windows@^0.63.32:
-  version "0.63.37"
-  resolved "https://registry.npmjs.org/react-native-windows/-/react-native-windows-0.63.37.tgz#a92fddd1907fbc5b93bd3afa4070836971d6d2f2"
-  integrity sha512-SZ7Q2C8hRaSclpzQKOj6N5PctetLUc6vgC/us8Qqw5EjLdXVAO46NSiQn6rqRHIg3Bwyq5lqRbps8MC8AfP20A==
+  version "0.63.40"
+  resolved "https://registry.npmjs.org/react-native-windows/-/react-native-windows-0.63.40.tgz#2452c21be24a4aab83280e9167c636e85bc1ca03"
+  integrity sha512-PyPlZJBGNTXWRbHVTbi+eSynKjXNarcmFc7obXYlekVua+A7cULzXnuhZJOJIFfoeiXLf+bWiZYY0aEYEumqwg==
   dependencies:
     "@babel/runtime" "^7.8.4"
-    "@react-native-windows/cli" "0.63.13"
+    "@react-native-windows/cli" "0.63.14"
     abort-controller "^3.0.0"
     anser "^1.4.9"
     base64-js "^1.1.2"
